@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>أبو سند العمري 💼</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5364">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Tajawal", sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff; margin: 0; padding: 0;
+            direction: rtl; min-height: 100vh;
+        }
+        header {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            text-align: center; padding: 15px;
+            font-size: 1.8em; font-weight: bold;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        nav {
+            display: flex; justify-content: space-around;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 0; position: sticky;
+            top: 0; z-index: 10; backdrop-filter: blur(8px);
+        }
+        nav button {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 10px 16px;
+            border-radius: 14px; font-size: 1em;
+            cursor: pointer; transition: 0.3s;
+        }
+        nav button:hover, nav button.active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        section { display: none; padding: 25px; animation: fadeIn 0.4s ease-in-out; }
+        section.active { display: block; }
+        h2 { border-right: 5px solid #00c6ff; padding-right: 10px; margin-bottom: 15px; }
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            border: none; color: white; border-radius: 10px;
+            padding: 10px 18px; margin-top: 10px;
+            cursor: pointer; transition: 0.3s;
+        }
+        button:hover { transform: scale(1.05); background: linear-gradient(135deg, #0072ff, #00c6ff); }
+        table {
+            width: 100%; border-collapse: collapse;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px; overflow: hidden;
+            margin-top: 15px;
+        }
+        th, td { padding: 10px; text-align: center; }
+        th { background: rgba(255,255,255,0.15); font-weight: bold; }
+        tr:nth-child(even) { background: rgba(255,255,255,0.05); }
+        input, select {
+            border: none; border-radius: 10px; padding: 10px;
+            font-size: 1em; width: 100%; margin: 5px 0;
+            background: rgba(255,255,255,0.1); color: white;
+            outline: none;
+        }
+        .form-row { display: flex; gap: 10px; }
+        .form-row > * { flex: 1; }
+        .transfer-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px; padding: 20px;
+            margin-bottom: 15px; border-left: 4px solid #00c6ff;
+        }
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 100;
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #0f2027, #203a43);
+            padding: 25px; border-radius: 15px;
+            width: 90%; max-width: 500px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+        @media (max-width: 768px) {
+            nav { flex-wrap: wrap; }
+            nav button { margin: 5px; flex: 1; min-width: 120px; }
+            table { font-size: 0.85em; }
+            th, td { padding: 8px 5px; }
+        }
+    </style>
+</head>
+<body>
+    <header>💼 أبو سند العمري</header>
+    <nav>
+        <button onclick="showSection('home')" class="active">🏠 الرئيسية</button>
+        <button onclick="showSection('customers')">👥 العملاء</button>
+        <button onclick="showSection('transfers')">💱 التحويلات</button>
+        <button onclick="showSection('settings')">⚙️ الإعدادات</button>
+    </nav>
+
+    <section id="home" class="active">
+        <h2>الصفحة الرئيسية</h2>
+        <div id="stats" class="card">
+            <p>💰 الرصيد الحالي: <span id="balance">0</span> ﷼</p>
+            <p>💵 إجمالي الإيداع: <span id="incomeTotal">0</span> ﷼</p>
+            <p>💸 إجمالي المصروفات: <span id="expenseTotal">0</span> ﷼</p>
+            <p>📈 إجمالي المبيعات: <span id="salesTotal">0</span> ﷼</p>
+            <p>💎 إجمالي الأرباح: <span id="profitTotal">0</span> ﷼</p>
+        </div>
+        <div class="card">
+            <h3>إجراءات سريعة</h3>
+            <div class="form-row">
+                <button onclick="showSection('customers'); document.getElementById('addCustomerBtn').click();">➕ إضافة عميل</button>
+                <button onclick="showSection('transfers'); document.getElementById('addTransferBtn').click();">💱 إضافة تحويل</button>
+                <button onclick="addExpense()">💸 إضافة مصروف</button>
+            </div>
+        </div>
+        <button id="resetValues" class="danger">🔄 تصفير القيم</button>
+    </section>
+
+    <section id="customers">
+        <h2>قسم العملاء</h2>
+        <div class="card">
+            <div class="form-row">
+                <input type="text" id="searchCustomer" placeholder="🔍 ابحث عن عميل..." style="flex: 2;">
+                <button id="addCustomerBtn">➕ إضافة عميل</button>
+            </div>
+        </div>
+        <table id="customerTable">
+            <thead>
+                <tr>
+                    <th>الاسم</th><th>المبيع</th><th>التكلفة</th><th>الربح</th>
+                    <th>المسدد</th><th>المتبقي</th><th>الرصيد بعد العملية</th><th>⚙️</th>
+                </tr>
+            </thead>
+            <tbody id="customerBody"></tbody>
+        </table>
+    </section>
+
+    <section id="transfers">
+        <h2>قسم التحويلات</h2>
+        <div class="card">
+            <div class="form-row">
+                <button id="addTransferBtn">➕ إضافة تحويل</button>
+                <button onclick="filterTransfers('all')" class="secondary">الكل</button>
+                <button onclick="filterTransfers('income')" class="secondary">الإيداعات</button>
+                <button onclick="filterTransfers('expense')" class="secondary">المصروفات</button>
+            </div>
+        </div>
+        <div id="transfersList"></div>
+    </section>
+
+    <section id="settings">
+        <h2>الإعدادات</h2>
+        <div class="card">
+            <h3>إدارة البيانات</h3>
+            <button id="clearData" class="danger">🧹 تصفير جميع البيانات</button>
+            <button id="exportData" class="secondary">📤 تصدير البيانات</button>
+            <button id="importData" class="secondary">📥 استيراد البيانات</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+        <div class="card">
+            <h3>معلومات التطبيق</h3>
+            <p>العملة: الريال اليمني 🇾🇪</p>
+            <p>إصدار التطبيق: 1.1</p>
+            <p>آخر تحديث: ٢٠٢٣</p>
+        </div>
+    </section>
+
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customerModalTitle">إضافة عميل جديد</h3>
+                <button class="close-modal" onclick="closeModal('customerModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <input type="text" id="customerName" placeholder="👤 اسم العميل">
+            </div>
+            <div class="form-row">
+                <input type="number" id="customerSale" placeholder="💰 المبيع">
+                <input type="number" id="customerCost" placeholder="💸 التكلفة">
+            </div>
+            <div class="form-group">
+                <input type="number" id="customerPaid" placeholder="💵 المسدد">
+            </div>
+            <div class="form-row">
+                <button id="saveCustomerBtn">💾 حفظ</button>
+                <button class="secondary" onclick="closeModal('customerModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="transferModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transferModalTitle">إضافة تحويل جديد</h3>
+                <button class="close-modal" onclick="closeModal('transferModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <input type="text" id="transferDescription" placeholder="📝 وصف التحويل">
+            </div>
+            <div class="form-group">
+                <select id="transferType">
+                    <option value="income">إيداع</option>
+                    <option value="expense">مصروف</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="number" id="transferAmount" placeholder="💵 المبلغ">
+            </div>
+            <div class="form-group">
+                <input type="date" id="transferDate">
+            </div>
+            <div class="form-row">
+                <button id="saveTransferBtn">💾 حفظ</button>
+                <button class="secondary" onclick="closeModal('transferModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ الحفظ في LocalStorage
+        function saveData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+        function loadData(key) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; }
+
+        // ✅ إظهار الأقسام
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (id === 'transfers') renderTransfers();
+        }
+
+        // ✅ بيانات التطبيق
+        let balance = loadData("balance") || 0;
+        let incomeTotal = loadData("incomeTotal") || 0;
+        let expenseTotal = loadData("expenseTotal") || 0;
+        let salesTotal = loadData("salesTotal") || 0;
+        let profitTotal = loadData("profitTotal") || 0;
+        let customers = loadData("customers") || [];
+        let transfers = loadData("transfers") || [];
+
+        // ✅ تحديث القيم في الواجهة
+        function updateStats() {
+            document.getElementById("balance").textContent = balance;
+            document.getElementById("incomeTotal").textContent = incomeTotal;
+            document.getElementById("expenseTotal").textContent = expenseTotal;
+            document.getElementById("salesTotal").textContent = salesTotal;
+            document.getElementById("profitTotal").textContent = profitTotal;
+            saveData("balance", balance); saveData("incomeTotal", incomeTotal);
+            saveData("expenseTotal", expenseTotal); saveData("salesTotal", salesTotal);
+            saveData("profitTotal", profitTotal);
+        }
+
+        // ✅ تصفير القيم
+        document.getElementById("resetValues").onclick = function() {
+            if (confirm("هل تريد تصفير جميع القيم؟")) {
+                balance = incomeTotal = expenseTotal = salesTotal = profitTotal = 0;
+                updateStats(); alert("✅ تم تصفير القيم بنجاح");
+            }
+        };
+
+        // ✅ إدارة العملاء
+        function renderCustomers() {
+            const tbody = document.getElementById("customerBody");
+            tbody.innerHTML = "";
+            customers.forEach((c, i) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${c.name}</td><td>${c.sale}</td><td>${c.cost}</td><td>${c.profit}</td>
+                    <td>${c.paid}</td><td>${c.remaining}</td><td>${c.balanceAfter}</td>
+                    <td><button onclick="editCustomer(${i})">✏️</button>
+                    <button onclick="deleteCustomer(${i})" class="danger">🗑️</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            saveData("customers", customers);
+        }
+
+        let currentCustomerIndex = null;
+        document.getElementById("addCustomerBtn").onclick = function() {
+            currentCustomerIndex = null;
+            document.getElementById("customerModalTitle").textContent = "إضافة عميل جديد";
+            document.getElementById("customerName").value = "";
+            document.getElementById("customerSale").value = "";
+            document.getElementById("customerCost").value = "";
+            document.getElementById("customerPaid").value = "";
+            openModal('customerModal');
+        };
+
+        function editCustomer(index) {
+            currentCustomerIndex = index;
+            const c = customers[index];
+            document.getElementById("customerModalTitle").textContent = "تعديل بيانات العميل";
+            document.getElementById("customerName").value = c.name;
+            document.getElementById("customerSale").value = c.sale;
+            document.getElementById("customerCost").value = c.cost;
+            document.getElementById("customerPaid").value = c.paid;
+            openModal('customerModal');
+        }
+
+        document.getElementById("saveCustomerBtn").onclick = function() {
+            const name = document.getElementById("customerName").value.trim();
+            if (!name) { alert("⚠️ يرجى إدخال اسم العميل"); return; }
+            const sale = parseFloat(document.getElementById("customerSale").value) || 0;
+            const cost = parseFloat(document.getElementById("customerCost").value) || 0;
+            const paid = parseFloat(document.getElementById("customerPaid").value) || 0;
+            const profit = sale - cost;
+            const remaining = sale - paid;
+            const balanceAfter = balance + profit;
+            const customerData = { name, sale, cost, profit, paid, remaining, balanceAfter };
+            if (currentCustomerIndex === null) {
+                customers.push(customerData);
+                balance += profit; incomeTotal += paid; salesTotal += sale; profitTotal += profit;
+            } else {
+                customers[currentCustomerIndex] = customerData;
+            }
+            updateStats(); renderCustomers(); closeModal('customerModal');
+        };
+
+        function deleteCustomer(index) {
+            if (confirm("🗑️ هل تريد حذف هذا العميل؟")) {
+                customers.splice(index, 1); renderCustomers();
+            }
+        }
+
+        document.getElementById("searchCustomer").oninput = function() {
+            const value = this.value.trim().toLowerCase();
+            const rows = document.querySelectorAll("#customerBody tr");
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                row.style.display = name.includes(value) ? "" : "none";
+            });
+        };
+
+        // ✅ إدارة التحويلات
+        function renderTransfers(filter = 'all') {
+            const container = document.getElementById("transfersList");
+            container.innerHTML = "";
+            let filteredTransfers = transfers;
+            if (filter !== 'all') filteredTransfers = transfers.filter(t => t.type === filter);
+            if (filteredTransfers.length === 0) {
+                container.innerHTML = '<div class="card"><p>لا توجد تحويلات لعرضها</p></div>';
+                return;
+            }
+            filteredTransfers.forEach((transfer, index) => {
+                const card = document.createElement("div");
+                card.className = "transfer-card";
+                card.innerHTML = `
+                    <h3>${transfer.description}</h3>
+                    <p>المبلغ: <strong>${transfer.amount} ﷼</strong></p>
+                    <p>النوع: <span style="color: ${transfer.type === 'income' ? '#4CAF50' : '#FF5252'}">${transfer.type === 'income' ? 'إيداع' : 'مصروف'}</span></p>
+                    <p>التاريخ: ${transfer.date}</p>
+                    <button onclick="deleteTransfer(${index})" class="danger" style="margin-top: 10px;">حذف</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        document.getElementById("addTransferBtn").onclick = function() {
+            document.getElementById("transferModalTitle").textContent = "إضافة تحويل جديد";
+            document.getElementById("transferDescription").value = "";
+            document.getElementById("transferType").value = "income";
+            document.getElementById("transferAmount").value = "";
+            document.getElementById("transferDate").valueAsDate = new Date();
+            openModal('transferModal');
+        };
+
+        document.getElementById("saveTransferBtn").onclick = function() {
+            const description = document.getElementById("transferDescription").value.trim();
+            const type = document.getElementById("transferType").value;
+            const amount = parseFloat(document.getElementById("transferAmount").value) || 0;
+            const date = document.getElementById("transferDate").value;
+            if (!description) { alert("⚠️ يرجى إدخال وصف للتحويل"); return; }
+            if (amount <= 0) { alert("⚠️ يرجى إدخال مبلغ صحيح"); return; }
+            const transfer = { description, type, amount, date: date || new Date().toISOString().split('T')[0] };
+            transfers.push(transfer);
+            if (type === 'income') { balance += amount; incomeTotal += amount; }
+            else { balance -= amount; expenseTotal += amount; }
+            updateStats(); saveData("transfers", transfers); renderTransfers(); closeModal('transferModal');
+        };
+
+        function deleteTransfer(index) {
+            if (confirm("هل تريد حذف هذا التحويل؟")) {
+                const transfer = transfers[index];
+                if (transfer.type === 'income') { balance -= transfer.amount; incomeTotal -= transfer.amount; }
+                else { balance += transfer.amount; expenseTotal -= transfer.amount; }
+                transfers.splice(index, 1);
+                updateStats(); saveData("transfers", transfers); renderTransfers();
+            }
+        }
+
+        function filterTransfers(type) { renderTransfers(type); }
+        function addExpense() {
+            const description = prompt("💸 وصف المصروف:");
+            if (!description) return;
+            const amount = parseFloat(prompt("💰 المبلغ:"));
+            if (!amount || amount <= 0) { alert("⚠️ يرجى إدخال مبلغ صحيح"); return; }
+            const transfer = { description, type: 'expense', amount, date: new Date().toISOString().split('T')[0] };
+            transfers.push(transfer);
+            balance -= amount; expenseTotal += amount;
+            updateStats(); saveData("transfers", transfers); alert("✅ تم إضافة المصروف بنجاح");
+        }
+
+        // ✅ إدارة النوافذ المنبثقة
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+        // ✅ الإعدادات
+        document.getElementById("clearData").onclick = function() {
+            if (confirm("⚠️ هل أنت متأكد من تصفير جميع البيانات؟")) {
+                localStorage.clear();
+                customers = []; transfers = [];
+                balance = incomeTotal = expenseTotal = salesTotal = profitTotal = 0;
+                renderCustomers(); renderTransfers(); updateStats();
+                alert("🧹 تم مسح كل البيانات بنجاح");
+            }
+        };
+
+        document.getElementById("exportData").onclick = function() {
+            const data = { balance, incomeTotal, expenseTotal, salesTotal, profitTotal, customers, transfers, exportDate: new Date().toISOString() };
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `abusanad-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        };
+
+        document.getElementById("importData").onclick = function() { document.getElementById("importFile").click(); };
+        document.getElementById("importFile").onchange = function(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (confirm("⚠️ سيتم استبدال جميع البيانات الحالية. هل تريد المتابعة؟")) {
+                        balance = data.balance || 0; incomeTotal = data.incomeTotal || 0;
+                        expenseTotal = data.expenseTotal || 0; salesTotal = data.salesTotal || 0;
+                        profitTotal = data.profitTotal || 0; customers = data.customers || [];
+                        transfers = data.transfers || [];
+                        updateStats(); renderCustomers(); renderTransfers();
+                        saveData("customers", customers); saveData("transfers", transfers);
+                        alert("✅ تم استيراد البيانات بنجاح");
+                    }
+                } catch (error) { alert("❌ خطأ في ملف البيانات. يرجى التأكد من صحة الملف"); }
+            };
+            reader.readAsText(file); e.target.value = '';
+        };
+
+        // ✅ أول تحميل
+        updateStats(); renderCustomers(); renderTransfers();
+    </script>
+</body>
+</html>
